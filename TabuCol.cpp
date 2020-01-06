@@ -21,7 +21,7 @@ int** mac_sas(int n) {
 		}
 	}
 	fstream file;
-	file.open("queen6.txt", ios::in);
+	file.open("le450_5a.txt", ios::in);
 	if (file.good()) {
 		file >> x;
 		cout<< x << endl;
@@ -100,7 +100,7 @@ int firstConflicts(int** graph, int n, vector<int>checksolution) {
 void tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolution) {
 
 	//solution<V,C>
-
+	int kk = k;
 	vector<pair<int, int>>tabulist;
 	vector<vector<int>>critical_solutions;
 	vector<int>bestsolution;
@@ -126,6 +126,7 @@ void tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolutio
 	}
 	cout << endl;
 
+	//zaczynamy tabu
 	while (nbiter < maxbiter) {
 		cout << "kurrrqa" << endl;
 
@@ -136,7 +137,7 @@ void tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolutio
 		if (conflicts == 0) {
 			cout << "done" << endl;
 			for (int u = 0; u < n; u++) {
-				cout<<bestsolution.at(u) + 1<<" " ;
+				//cout<<bestsolution.at(u) + 1<<" " ;
 			
 			}
 	cout << "znaleziono rozwiązanie jakie było życzeniem";
@@ -156,9 +157,9 @@ void tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolutio
 		int node =firstConflicts(graph,n,currentsolution);
 	//	cout << "node: " << node << endl;
 
-		while (neighborhood.size() != k) {
+	//	while (neighborhood.size() != k) {
 
-			
+	for(int h=0;h<100;h++){
 			if (failed_neighborhood == neighborhood_size * 2) {
 				node = getRandom(0, n);
 				if (critical_solutions.size() > 0) {
@@ -170,7 +171,11 @@ void tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolutio
 
 			found = false;
 			//losowanie nowego koloru
-			int color = getRandom(0, k);
+			if (kk == 0)
+				kk = k;
+			int color = kk;
+			kk--;
+				//getRandom(0, k);
 			while (currentsolution.at(node) == color)
 				color = getRandom(0, k);
 			//Check if that color is already in the neighborhood
@@ -221,9 +226,9 @@ void tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolutio
 
 		currentsolution = bestneighbour;
 
-		if (calculateConflicts(graph, n,bestsolution) < calculateConflicts(graph, n, currentsolution)) {
+		if (calculateConflicts(graph, n,bestsolution) > calculateConflicts(graph, n, currentsolution)) {
 			bestsolution = currentsolution;
-			critical_solutions.push_back(currentsolution);
+			//critical_solutions.push_back(currentsolution);
 		}
 		//teracje na plus
 		nbiter += 1;
@@ -291,12 +296,12 @@ vector<int>  Greedy(int** A, int n) {
 int main()
 {
 	int n;
-	n = 36;
+	n = 450;
 	int** tab = mac_sas(n);
 	vector<int>currentsolution;
 	currentsolution = Greedy(tab, n);
 	//currentsolution.at(1) = 2;
-	tabucol(tab,8 , n, 7, currentsolution);
+	tabucol(tab,12 , n, 7, currentsolution);
 	delete[]tab;
 	return 0;
 }
