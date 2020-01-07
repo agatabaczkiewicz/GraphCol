@@ -110,7 +110,7 @@ void tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolutio
 	//vector<int>neigbours;
 	int nbiter = 0,bestneigbourcal=0;
 	int maxbiter = 10000;
-	int conflicts = 0,neighborhood_size=n-1;
+	int conflicts = 0,neighborhood_size=n/2;
 	bool found;
 	int index = 0;
 	//sprawdzanie konfliktów
@@ -136,12 +136,17 @@ void tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolutio
 
 		if (conflicts == 0) {
 			cout << "done" << endl;
-			for (int u = 0; u < n; u++) {
-				//cout<<bestsolution.at(u) + 1<<" " ;
-			
+			if (bestsolution.size() > 0) {
+				for (int u = 0; u < n; u++) {
+					cout << bestsolution.at(u) + 1 << " ";
+
+				}
+				cout << "znaleziono rozwiązanie jakie było życzeniem";
+				break; //znaleziono rozwiązanie jakie było życzeniem
 			}
-	cout << "znaleziono rozwiązanie jakie było życzeniem";
-			break; //znaleziono rozwiązanie jakie było życzeniem
+			else
+				break;
+	
 		}
 
 		//looking for the neibours
@@ -162,10 +167,10 @@ void tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolutio
 	for(int h=0;h<100;h++){
 			if (failed_neighborhood == neighborhood_size * 2) {
 				node = getRandom(0, n);
-				if (critical_solutions.size() > 0) {
-					local_current = critical_solutions.at(critical_solutions.size() - 1);
-					critical_solutions.pop_back();
-				}
+				//if (critical_solutions.size() > 0) {
+				//	local_current = critical_solutions.at(critical_solutions.size() - 1);
+				//	critical_solutions.pop_back();
+				//}
 				failed_neighborhood = 0;
 			}
 
@@ -218,6 +223,7 @@ void tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolutio
 		}
 
 		tabulist.push_back(bestmove);
+
 		for (int u = 0; u < tabulist.size(); u++) {
 
 			cout << "tabu" << endl << "Wierzcholek " << tabulist.at(u).first + 1 << " Kolor: "
