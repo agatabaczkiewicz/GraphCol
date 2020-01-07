@@ -1,8 +1,8 @@
 ﻿#include<fstream>
 #include<iostream>
 #include<vector>
-#include<utility> 
-#include<set> 
+#include<utility>
+#include<set>
 #include<random>
 
 using namespace std;
@@ -25,7 +25,7 @@ int** mac_sas(int n) {
 	if (file.good()) {
 		file >> x;
 		cout<< x << endl;
-	
+
 		while (!file.eof()) {
 			file >> o;
 			//cout << o;
@@ -41,11 +41,11 @@ int** mac_sas(int n) {
 }
 
 
-double getRandom(double start, double finish) {
-	random_device rd;
-	mt19937 mt(rd());
-	uniform_real_distribution<double> dist(start, finish);
-	return dist(mt);
+int getRInt(int x){
+    default_random_engine generator;
+    uniform_int_distribution<int> distribution(0,x);
+    return distribution(generator);
+
 }
 
 bool checkTabuList(int p, int c,vector<pair<int,int>> tabulist) {
@@ -87,7 +87,7 @@ int firstConflicts(int** graph, int n, vector<int>checksolution) {
 				if (graph[i][j] == 1&& checksolution[i] == checksolution[j]) {
 						conflictnode = i;
 						found = true;
-					
+
 				}
 			}
 
@@ -114,11 +114,11 @@ void tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolutio
 	bool found;
 	int index = 0;
 	//sprawdzanie konfliktów
-	
+
 	//jeżeli rozwiązanie greedy daje kolor większy niż cel k
 	for (int u = 0; u < n; u++) {
 		if (currentsolution.at(u) >= k)
-			currentsolution.at(u) = getRandom(0, k);
+			currentsolution.at(u) = getRInt(k);
 	}
 
 	for (int u = 0; u < n; u++) {
@@ -146,12 +146,12 @@ void tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolutio
 			}
 			else
 				break;
-	
+
 		}
 
 		//looking for the neibours
 		int failed_neighborhood = 0;
-	
+
 
 
 		set<int> neighborhood;
@@ -166,7 +166,7 @@ void tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolutio
 
 	for(int h=0;h<100;h++){
 			if (failed_neighborhood == neighborhood_size * 2) {
-				node = getRandom(0, n);
+				node = getRInt(n);
 				//if (critical_solutions.size() > 0) {
 				//	local_current = critical_solutions.at(critical_solutions.size() - 1);
 				//	critical_solutions.pop_back();
@@ -182,7 +182,7 @@ void tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolutio
 			kk--;
 				//getRandom(0, k);
 			while (currentsolution.at(node) == color)
-				color = getRandom(0, k);
+				color = getRInt(k);
 			//Check if that color is already in the neighborhood
 			if (neighborhood.size() > 0) {
 				it = neighborhood.find(color);
@@ -212,7 +212,7 @@ void tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolutio
 			}
 		}
 
-	
+
 
 		bestmove.first = node;
 		bestmove.second = bestneighbour.at(node);
@@ -242,9 +242,9 @@ void tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolutio
 
 
 
-	
+
 	cout << "po tabu "<<"conflicts: "<<conflicts << endl;
-	
+
 	cout << "koniec";
 }
 
