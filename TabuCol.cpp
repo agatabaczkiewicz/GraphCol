@@ -4,7 +4,9 @@
 #include<utility> 
 #include<set> 
 #include<random>
-
+#include<map>
+#include<set>
+#include<iterator>
 using namespace std;
 
 int** mac_sas(int n) {
@@ -21,7 +23,7 @@ int** mac_sas(int n) {
 		}
 	}
 	fstream file;
-	file.open("le450_5a.txt", ios::in);
+	file.open("queen6.txt", ios::in);
 	if (file.good()) {
 		file >> x;
 		cout<< x << endl;
@@ -59,7 +61,17 @@ bool checkTabuList(int p, int c,vector<pair<int,int>> tabulist) {
 
 	return in_tabu_list;
 };
+int indexTabuList(int p, int c, vector<pair<int, int>> tabulist) {
+	bool in_tabu_list = false;
+	int i;
+	for ( i= 0; i < tabulist.size() && !in_tabu_list; i++) {
 
+		if (tabulist[i].first == p && tabulist[i].second == c)
+			return i;
+	}
+
+	return -1;
+};
 
 int calculateConflicts(int** graph, int n,vector<int>checksolution) {
 	int conflict = 0;
@@ -78,32 +90,50 @@ int calculateConflicts(int** graph, int n,vector<int>checksolution) {
 	return conflict;
 
 }
-int firstConflicts(int** graph, int n, vector<int>checksolution) {
+vector<int> firstConflicts(int** graph, int n, vector<int>checksolution) {
 	int conflictnode = 0;
+	set<int>con;
+	vector<int>con2;
+//cout << "haloo";
 	bool found = false;
-	while (!found) {
+	//while (!found) {
 		for (int i = 0; i < n; i++) {
 			for (int j = i + 1; j < n; j++) {
-				if (graph[i][j] == 1&& checksolution[i] == checksolution[j]) {
-						conflictnode = i;
-						found = true;
-					
+				if (graph[i][j] == 1 && checksolution[i] == checksolution[j]) {
+					//conflictnode = i;
+					//found = true;
+					con.insert(i);
+					con.insert(j);
+					//cout << i << j;
 				}
 			}
 
 		}
-	}
-	return conflictnode;
+	
+		//cout << con.size() << endl;
+		set<int>::iterator itr;
+		for (itr =con.begin(); itr !=con.end(); ++itr)
+		{
+			con2.push_back(*itr);
+		//	cout << " " << *itr;
+		}
+	//	cout << endl;
+			
+	//	cout << getRandom(0, con2.size())<<endl;
+	//	conflictnode = con2.at(getRandom(0, con2.size()));
+	//	cout << conflictnode << endl;
+	//}*/
+	return con2;
 
 }
 
-void tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolution) {
+bool tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolution) {
 
 	//solution<V,C>
 	int kk = k;
 	vector<pair<int, int>>tabulist;
 	vector<vector<int>>critical_solutions;
-	vector<int>bestsolution;
+	vector<int>move;
 	vector<int>bestneighbour;
 	vector<int>local_current;
 	pair<int, int>bestmove;
@@ -114,7 +144,8 @@ void tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolutio
 	bool found;
 	int index = 0;
 	//sprawdzanie konfliktów
-	
+	map<int, int>aspiration;
+	//	int aspiration=0;
 	//jeżeli rozwiązanie greedy daje kolor większy niż cel k
 	for (int u = 0; u < n; u++) {
 		if (currentsolution.at(u) >= k)
@@ -128,24 +159,25 @@ void tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolutio
 
 	//zaczynamy tabu
 	while (nbiter < maxbiter) {
-		cout << "kurrrqa" << endl;
+		//cout << "kurrrqa" << endl;
 
 
 		conflicts = calculateConflicts(graph, n, currentsolution);
-		cout << conflicts;
-
+	//	;
+		move= firstConflicts(graph, n, currentsolution);
 		if (conflicts == 0) {
-			cout << "done" << endl;
-			if (bestsolution.size() > 0) {
+			cout << "done "<< conflicts <<"kolor: "<<k<<endl;
+			//if (bestsolution.size() > 0) {
 				for (int u = 0; u < n; u++) {
-					cout << bestsolution.at(u) + 1 << " ";
+					cout << currentsolution.at(u) + 1 << " ";
 
 				}
 				cout << "znaleziono rozwiązanie jakie było życzeniem";
-				break; //znaleziono rozwiązanie jakie było życzeniem
-			}
-			else
-				break;
+				//break; //znaleziono rozwiązanie jakie było życzeniem
+				return true;
+			//}
+			//else
+			//	break;
 	
 		}
 
@@ -153,69 +185,94 @@ void tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolutio
 		int failed_neighborhood = 0;
 	
 
-
 		set<int> neighborhood;
 		pair<int, int> best_move;
 		set<int>::iterator it;
-		local_current = bestneighbour = currentsolution;
+		
+		bestneighbour = currentsolution; 
 		//numer pierwszego wierzchołka który powoduje konflikt
-		int node =firstConflicts(graph,n,currentsolution);
+		
 	//	cout << "node: " << node << endl;
 
 	//	while (neighborhood.size() != k) {
-
+		int node;
 	for(int h=0;h<100;h++){
-			if (failed_neighborhood == neighborhood_size * 2) {
+		// node =firstConflicts(graph,n,currentsolution);
+		node = move.at(getRandom(0, move.size()));
+		// cout << "node " << node << endl;
+			/*if (failed_neighborhood == neighborhood_size * 2) {
 				node = getRandom(0, n);
 				//if (critical_solutions.size() > 0) {
 				//	local_current = critical_solutions.at(critical_solutions.size() - 1);
 				//	critical_solutions.pop_back();
 				//}
 				failed_neighborhood = 0;
-			}
-
-			found = false;
+			}*/
+		local_current = currentsolution;
+		found = false;
 			//losowanie nowego koloru
-			if (kk == 0)
-				kk = k;
-			int color = kk;
-			kk--;
+		if (kk == 0)
+			kk = k;
+		int color = kk; //= getRandom(0, k);
+			//kk;
+		kk--;
 				//getRandom(0, k);
 			while (currentsolution.at(node) == color)
 				color = getRandom(0, k);
 			//Check if that color is already in the neighborhood
-			if (neighborhood.size() > 0) {
+			//cout << "color " << color << endl;
+		/*	if (neighborhood.size() > 0) {
 				it = neighborhood.find(color);
 				if (it != neighborhood.end())
 					found = true;
-			}
+			}*/
 
+		//	if (!found) {
+			//	neighborhood.insert(color);
+				local_current.at(node) = color;
+				int localcal = calculateConflicts(graph, n, local_current);
+				
+				if (localcal < conflicts) {
+					aspiration[conflicts] = conflicts - 1;
+					if (localcal <= aspiration[conflicts]) {
+						aspiration[conflicts] = localcal - 1;
+						int t = indexTabuList(node, color, tabulist);
+						if (t>=0) {
+							tabulist.erase(tabulist.begin()+t);
+						}
+					}
+
+				}
+		//	}
 
 			//jeżeli koloru nie ma w sąsiedztwie i ruch nie jest tabu
-			if (!found && !checkTabuList(node, color, tabulist)) {
+			/*if (!found && !checkTabuList(node, color, tabulist)) {
 				//cout << "jestem";
 				neighborhood.insert(color);
 				local_current.at(node) = color;   //lokalne rozwiązanie zmienia wierzchołek na ten kolor
 				int localcal = calculateConflicts(graph, n, local_current);  //oblicza ilość konfliktów tego rozwiązania
 
-				if (bestneigbourcal > localcal||index==0) { //jeżeli dotychczas najlepszy sąsiad miał więcej konflikót to teraz jest nim local lub przy pierwszej iteracji
+				if (bestneigbourcal >= localcal||index==0) { //jeżeli dotychczas najlepszy sąsiad miał więcej konflikót to teraz jest nim local lub przy pierwszej iteracji
 					index++;
 					bestneighbour = local_current;
 					bestneigbourcal = localcal;
 				}
-			}
+			}*/
 			else {
 				//neighborhood.clear();
-				failed_neighborhood++;
+				//failed_neighborhood++;
+				if (checkTabuList(node, color, tabulist)) {
+					continue;
+				}
 
 
 			}
-		}
+	}
 
 	
 
 		bestmove.first = node;
-		bestmove.second = bestneighbour.at(node);
+		bestmove.second = local_current.at(node);
 
 		//zmiana tabulisty
 		if (tabulist.size() > tabu_size) {
@@ -224,18 +281,18 @@ void tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolutio
 
 		tabulist.push_back(bestmove);
 
-		for (int u = 0; u < tabulist.size(); u++) {
+		/*for (int u = 0; u < tabulist.size(); u++) {
 
 			cout << "tabu" << endl << "Wierzcholek " << tabulist.at(u).first + 1 << " Kolor: "
 				<< tabulist.at(u).second + 1 << endl;
-		}
+		}*/
 
-		currentsolution = bestneighbour;
+		currentsolution = local_current;
 
-		if (calculateConflicts(graph, n,bestsolution) > calculateConflicts(graph, n, currentsolution)) {
-			bestsolution = currentsolution;
+	//	if (calculateConflicts(graph, n,bestsolution) >= calculateConflicts(graph, n, currentsolution)) {
+	//		bestsolution = currentsolution;
 			//critical_solutions.push_back(currentsolution);
-		}
+	//	}
 		//teracje na plus
 		nbiter += 1;
 	}
@@ -246,6 +303,7 @@ void tabucol( int ** graph, int k,int n,int tabu_size,vector <int>currentsolutio
 	cout << "po tabu "<<"conflicts: "<<conflicts << endl;
 	
 	cout << "koniec";
+	return false;
 }
 
 vector<int>  Greedy(int** A, int n) {
@@ -301,13 +359,26 @@ vector<int>  Greedy(int** A, int n) {
 
 int main()
 {
-	int n;
-	n = 450;
+	int n,k;
+	n = 36;
 	int** tab = mac_sas(n);
 	vector<int>currentsolution;
+	bool result;
+	/*for (int i = 0; i < 50; i++) {
+		//int x = getRandom(0, 14);
+		cout <<getRandom(0,14) << endl;
+	}*/
 	currentsolution = Greedy(tab, n);
-	//currentsolution.at(1) = 2;
-	tabucol(tab,12 , n, 7, currentsolution);
+	//return 0;
+	//currentsolution.at(1) = 0;
+	result = true;
+	k = 11;
+	//int v = firstConflicts(tab, n, currentsolution);
+	while(result==true){
+		result=tabucol(tab,k, n, 7, currentsolution);
+		k--;
+	}
+	//cout << "v: " << v;
 	delete[]tab;
 	return 0;
 }
